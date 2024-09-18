@@ -39,16 +39,13 @@ def main():
         online_network = EfficientNet(**config['network']).to(device)
     else:
         raise ValueError(f"Model {config['network']['name']} not available.")
-    pretrained_folder = config['network']['pretrain']
+    pretrained_path = config['network']['pretrain']
 
     # load pre-trained model if defined
-    if pretrained_folder:
+    if pretrained_path:
         try:
-            checkpoints_folder = os.path.join('./runs', pretrained_folder, 'checkpoints')
-
             # load pre-trained parameters
-            load_params = torch.load(os.path.join(os.path.join(checkpoints_folder, 'model.pth')),
-                                     map_location=torch.device(torch.device(device)))
+            load_params = torch.load(pretrained_path, map_location=torch.device(torch.device(device)))
 
             online_network.load_state_dict(load_params['online_network_state_dict'])
 
@@ -56,7 +53,7 @@ def main():
             print("Pre-trained weights not found. Training from scratch.")
 
     # predictor network
-    predictor = MLPHead(in_channels=online_network.projetion.net[-1].out_features,
+    predictor = MLPHead(in_channels=online_network.projection.net[-1].out_features,
                         **config['network']['projection_head']).to(device)
 
     # target encoder

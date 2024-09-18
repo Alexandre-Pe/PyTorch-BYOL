@@ -14,12 +14,12 @@ class ResNet(torch.nn.Module):
             raise ValueError(f"Model {kwargs['name']} not available.")
 
         self.encoder = torch.nn.Sequential(*list(resnet.children())[:-1])
-        self.projetion = MLPHead(in_channels=resnet.fc.in_features, **kwargs['projection_head'])
+        self.projection = MLPHead(in_channels=resnet.fc.in_features, **kwargs['projection_head'])
 
     def forward(self, x):
         h = self.encoder(x)
         h = h.view(h.shape[0], h.shape[1])
-        return self.projetion(h)
+        return self.projection(h)
 
 class EfficientNet(torch.nn.Module):
     def __init__(self, *args, **kwargs):
@@ -44,9 +44,9 @@ class EfficientNet(torch.nn.Module):
             raise ValueError(f"Model {kwargs['name']} not available.")
 
         self.encoder = torch.nn.Sequential(*list(efficientnet.children())[:-1])
-        self.projetion = MLPHead(in_channels=efficientnet.classifier[1].in_features, **kwargs['projection_head'])
+        self.projection = MLPHead(in_channels=efficientnet.classifier[1].in_features, **kwargs['projection_head'])
 
     def forward(self, x):
         h = self.encoder(x)
         h = h.view(h.shape[0], h.shape[1])
-        return self.projetion(h)
+        return self.projection(h)
