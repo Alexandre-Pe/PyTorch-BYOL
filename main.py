@@ -2,12 +2,13 @@ import os
 
 import torch
 import yaml
-from torchvision import datasets
+import ctools
 from data.multi_view_data_injector import MultiViewDataInjector
 from data.transforms import get_simclr_data_transforms
 from models.mlp_head import MLPHead
-from models.resnet_base_network import ResNet18
+from models.base_network import EfficientNet, ResNet
 from trainer import BYOLTrainer
+from data.reader import loader
 
 print(torch.__version__)
 torch.manual_seed(0)
@@ -16,17 +17,29 @@ torch.manual_seed(0)
 def main():
     config = yaml.load(open("./config/config.yaml", "r"), Loader=yaml.FullLoader)
 
+    data = config.data
+    save = config.save
+    batch_size = config.trainer.batch_size
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Training with: {device}")
 
     data_transform = get_simclr_data_transforms(**config['data_transforms'])
+    transform = MultiViewDataInjector([data_transform, data_transform])
 
-    train_dataset = datasets.STL10('/home/thalles/Downloads/', split='train+unlabeled', download=True,
-                                   transform=MultiViewDataInjector([data_transform, data_transform]))
+    if data.isFolder:
+        data, _ = ctools.readfolder(data)
+
+    train_dataset = loader(data, batch_size, transform, shuffle=True, num_workers=2)
 
     # online network
-    online_network = ResNet18(**config['network']).to(device)
-    pretrained_folder = config['network']['fine_tune_from']
+    if "resnet" in config['network']['name']:
+        online_network = ResNet(**config['network']).to(device)
+    elif "efficientnet" in config['network']['name']:
+        online_network = EfficientNet(**config['network']).to(device)
+    else:
+        raise ValueError(f"Model {config['network']['name']} not available.")
+    pretrained_folder = config['network']['pretrain']
 
     # load pre-trained model if defined
     if pretrained_folder:
@@ -47,7 +60,12 @@ def main():
                         **config['network']['projection_head']).to(device)
 
     # target encoder
-    target_network = ResNet18(**config['network']).to(device)
+    if "resnet" in config['network']['name']:
+        target_network = ResNet(**config['network']).to(device)
+    elif "efficientnet" in config['network']['name']:
+        target_network = EfficientNet(**config['network']).to(device)
+    else:
+        raise ValueError(f"Model {config['network']['name']} not available.")
 
     optimizer = torch.optim.SGD(list(online_network.parameters()) + list(predictor.parameters()),
                                 **config['optimizer']['params'])
