@@ -1,8 +1,8 @@
 network:
-  name: resnet18
+  name: efficientnet_b0
 
   # Specify a folder containing a pre-trained model to fine-tune. If training from scratch, pass None.
-  fine_tune_from: 'resnet-18_40-epochs'
+  pretrain: 
 
   projection_head:
     mlp_hidden_size: 512
@@ -10,7 +10,7 @@ network:
 
 data_transforms:
   s: 1
-  input_shape: (96,96,3)
+  input_shape: (224,224,3)
 
 trainer:
   batch_size: 64
@@ -24,3 +24,16 @@ optimizer:
     lr: 0.03
     momentum: 0.9
     weight_decay: 0.0004
+
+save:
+  metapath: "D:/PhD/Experiments/gazebyol"
+  folder: mpii
+  model_name: trans1
+  step: 10
+
+data:
+  image: "D:/PhD/Datasets/MPIIFaceGaze/images"
+  label: "D:/PhD/Datasets/MPIIFaceGaze/labels/p00.txt"
+  header: False
+  name: mpii
+  isFolder: False
