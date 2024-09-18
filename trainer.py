@@ -43,10 +43,7 @@ class BYOLTrainer:
             param_k.data.copy_(param_q.data)  # initialize
             param_k.requires_grad = False  # not update by gradient
 
-    def train(self, train_dataset):
-
-        train_loader = DataLoader(train_dataset, batch_size=self.batch_size,
-                                  num_workers=self.num_workers, drop_last=False, shuffle=True)
+    def train(self, train_loader):
 
         niter = 0
         model_checkpoints_folder = os.path.join(self.writer.log_dir, 'checkpoints')

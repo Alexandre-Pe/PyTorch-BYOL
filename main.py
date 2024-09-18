@@ -30,7 +30,7 @@ def main():
     if data.isFolder:
         data, _ = ctools.readfolder(data)
 
-    train_dataset = loader(data, batch_size, transform, shuffle=True, num_workers=2)
+    train_loader = loader(data, batch_size, transform, shuffle=True, num_workers=2)
 
     # online network
     if "resnet" in config['network']['name']:
@@ -74,7 +74,7 @@ def main():
                           device=device,
                           **config['trainer'])
 
-    trainer.train(train_dataset)
+    trainer.train(train_loader)
 
 
 if __name__ == '__main__':
