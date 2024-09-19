@@ -1,7 +1,8 @@
 import os
-
 import torch
 import yaml
+from easydict import EasyDict as edict
+
 import ctools
 from data.multi_view_data_injector import MultiViewDataInjector
 from data.transforms import get_simclr_data_transforms
@@ -15,7 +16,7 @@ torch.manual_seed(0)
 
 
 def main():
-    config = yaml.load(open("./config/config.yaml", "r"), Loader=yaml.FullLoader)
+    config = edict(yaml.load(open("./config/config.yaml", "r"), Loader=yaml.FullLoader))
 
     data = config.data
     save = config.save
@@ -66,12 +67,15 @@ def main():
 
     optimizer = torch.optim.SGD(list(online_network.parameters()) + list(predictor.parameters()),
                                 **config['optimizer']['params'])
+    
+    log_dir = os.path.join(save.metapath, data.name, config['network']['name'])
 
     trainer = BYOLTrainer(online_network=online_network,
                           target_network=target_network,
                           optimizer=optimizer,
                           predictor=predictor,
                           device=device,
+                          log_dir=log_dir,
                           **config['trainer'])
 
     trainer.train(train_loader)
