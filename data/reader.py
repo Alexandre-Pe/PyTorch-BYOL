@@ -1,10 +1,9 @@
 import os
-import cv2 
 import torch
 import numpy as np
 from easydict import EasyDict as edict
 from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms
+from PIL import Image
 
 def Decode_MPII(line):
     """
@@ -133,7 +132,8 @@ class trainloader(Dataset):
     line = line.strip().split(" ")
     anno = self.data.decode(line)
 
-    img = cv2.imread(os.path.join(self.data.root, anno.face))
+    img_path = os.path.join(self.data.root, anno.face)
+    img = Image.open(img_path).convert('RGB')
     img = self.transforms(img)
 
     label = np.array(anno.gaze2d).astype("float")
