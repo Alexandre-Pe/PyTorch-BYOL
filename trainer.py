@@ -9,14 +9,14 @@ from utils import _create_model_training_folder
 
 
 class BYOLTrainer:
-    def __init__(self, online_network, target_network, predictor, optimizer, device, **params):
+    def __init__(self, online_network, target_network, predictor, optimizer, device, log_dir, **params):
         self.online_network = online_network
         self.target_network = target_network
         self.optimizer = optimizer
         self.device = device
         self.predictor = predictor
         self.max_epochs = params['max_epochs']
-        self.writer = SummaryWriter()
+        self.writer = SummaryWriter(log_dir)
         self.m = params['m']
         self.batch_size = params['batch_size']
         self.num_workers = params['num_workers']

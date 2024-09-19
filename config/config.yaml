@@ -27,8 +27,6 @@ optimizer:
 
 save:
   metapath: "D:/PhD/Experiments/gazebyol"
-  folder: mpii
-  model_name: trans1
   step: 10
 
 data:
