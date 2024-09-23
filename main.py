@@ -2,6 +2,7 @@ import os
 import torch
 import yaml
 from easydict import EasyDict as edict
+from datetime import datetime
 
 import ctools
 from data.multi_view_data_injector import MultiViewDataInjector
@@ -11,7 +12,7 @@ from models.base_network import EfficientNet, ResNet
 from trainer import BYOLTrainer
 from data.reader import loader
 
-print(torch.__version__)
+# print(torch.__version__)
 torch.manual_seed(0)
 
 
@@ -69,6 +70,9 @@ def main():
                                 **config['optimizer']['params'])
     
     log_dir = os.path.join(save.metapath, data.name, config['network']['name'])
+    log_dir = os.path.join(log_dir, datetime.now().strftime("%Y%m%d-%H%M%S"))
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
     trainer = BYOLTrainer(online_network=online_network,
                           target_network=target_network,
