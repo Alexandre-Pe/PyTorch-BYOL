@@ -139,11 +139,7 @@ class trainloader(Dataset):
     label = np.array(anno.gaze2d).astype("float")
     label = torch.from_numpy(label).type(torch.FloatTensor)
 
-    data = edict()
-    data.face = img
-    # data.name = anno.name
-
-    return data, label
+    return img, label
 
 def loader(source, batch_size, transform, shuffle=True,  num_workers=0):
     dataset = trainloader(source, transform)
