@@ -5,18 +5,18 @@ network:
   pretrain: 
 
   projection_head:
-    mlp_hidden_size: 512
-    projection_size: 128
+    mlp_hidden_size: 128
+    projection_size: 3
 
 data_transforms:
   s: 1
   input_shape: (224,224,3)
 
 trainer:
-  batch_size: 64
+  batch_size: 32
   m: 0.996 # momentum update
-  checkpoint_interval: 5000
-  max_epochs: 40
+  checkpoint_interval: 2
+  max_epochs: 1
   num_workers: 4
 
 optimizer:
@@ -27,7 +27,6 @@ optimizer:
 
 save:
   metapath: "D:/PhD/Experiments/gazebyol"
-  step: 10
 
 data:
   image: "D:/PhD/Datasets/MPIIFaceGaze/images"
