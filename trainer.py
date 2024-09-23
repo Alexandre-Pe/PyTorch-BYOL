@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import torchvision
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 from utils import _create_model_training_folder
 
@@ -50,9 +51,13 @@ class BYOLTrainer:
 
         self.initializes_target_network()
 
-        for epoch_counter in range(self.max_epochs):
+        tqdm_epochs = tqdm(range(self.max_epochs), desc='Epochs')
 
-            for (batch_view_1, batch_view_2), _ in train_loader:
+        for epoch_counter in tqdm_epochs:
+            tqdm_epochs.set_description(f'Epoch {epoch_counter}')
+            tqdm_batch = tqdm(train_loader, desc="Batchs", leave=False)
+
+            for (batch_view_1, batch_view_2), _ in tqdm_batch:
 
                 batch_view_1 = batch_view_1.to(self.device)
                 batch_view_2 = batch_view_2.to(self.device)
@@ -74,10 +79,16 @@ class BYOLTrainer:
                 self._update_target_network_parameters()  # update the key encoder
                 niter += 1
 
-            print("End of epoch {}".format(epoch_counter))
+                tqdm_batch.set_postfix({'loss': loss.item()})
+
+            if epoch_counter % self.checkpoint_interval == 0:
+                self.save_model(os.path.join(model_checkpoints_folder, f'model_{epoch_counter}.pth'))
+            
+            # Update loss on progress bar
+            tqdm_epochs.set_postfix({'loss': loss.item()})
 
         # save checkpoints
-        self.save_model(os.path.join(model_checkpoints_folder, 'model.pth'))
+        self.save_model(os.path.join(model_checkpoints_folder, 'model_final.pth'))
 
     def update(self, batch_view_1, batch_view_2):
         # compute query feature
