@@ -9,9 +9,9 @@ def preprocess_mpiifacegaze(path):
     os.makedirs(os.path.join(path, "labels"))
     for i in range(15):
         # Update image paths in labels
-        with open(os.path.join(path, f"p{i:02d}.txt"), "r") as f:
+        with open(os.path.join(path, f"p{i:02d}", f"p{i:02d}.txt"), "r") as f:
             lines = f.readlines()
-        with open(os.path.join(path, f"p{i:02d}.txt"), "w") as f:
+        with open(os.path.join(path, f"p{i:02d}", f"p{i:02d}.txt"), "w") as f:
             for line in lines:
                 line = line.strip().split(" ")
                 line[0] = os.path.join(f"p{i:02d}", line[0])
